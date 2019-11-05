@@ -11,8 +11,4 @@ SynthesisHpFilter = [1 -1] / sqrt(2);
 OriginSynthesis = 1; 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% I will implement it till rowwise convolution first.   -> Done
-% Next I will implement col sub sampling taking into consideration the
-% origin of the filter.                                              ->Done
-
-% Next I will implement reconstruction of image decomposition
+% Next I will implement colwise operations

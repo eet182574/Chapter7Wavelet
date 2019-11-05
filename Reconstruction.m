@@ -1,0 +1,57 @@
+LL = ImageRwConLSubColConLLSub;
+LH = ImageRwConLSubColConLHSub;
+HL = ImageRwConHSubColConHLSub;
+HH = ImageRwConHSubColConHHSub;
+
+%% Upsample all 04 bands
+[rows,cols] = size(LL);
+LL_Upsampled = zeros(rows,cols*2);
+LH_Upsampled = zeros(rows,cols*2);
+HL_Upsampled = zeros(rows,cols*2);
+HH_Upsampled = zeros(rows,cols*2);
+
+%% Fill values 
+for i = 1:cols
+    LL_Upsampled(:,2*(i-1)+1) = LL(:,i);
+    LH_Upsampled(:,2*(i-1)+1) = LH(:,i);
+    HL_Upsampled(:,2*(i-1)+1) = HL(:,i);
+    HH_Upsampled(:,2*(i-1)+1) = HH(:,i);
+end
+
+% Show the intermediate result
+figure,subplot(2,2,1),imshow(LL_Upsampled,[]);title('LL Upsampled Image');
+subplot(2,2,2),imshow(LH_Upsampled,[]);title('LH Upsampled Image');
+subplot(2,2,3),imshow(HL_Upsampled,[]);title('HL Upsampled Image');
+subplot(2,2,4),imshow(HH_Upsampled,[]);title('HH Upsampled Image');
+
+%% Do Rowwise Convolution over Upsampled Images
+[rows_2,cols_2] = size(LH_Upsampled);
+FilterLength = length(SynthesisLpFilter);
+LL_UpsampledConv = zeros(rows_2,cols_2 + FilterLength-1);
+LH_UpsampledConv = LL_UpsampledConv;
+HL_UpsampledConv = LL_UpsampledConv;
+HH_UpsampledConv = LL_UpsampledConv;
+
+for i = 1:rows_2
+    LL_UpsampledConv(i,:) = conv(LL_Upsampled(i,:),SynthesisLpFilter);
+    LH_UpsampledConv(i,:) = conv(LH_Upsampled(i,:),SynthesisHpFilter);
+    HL_UpsampledConv(i,:) = conv(HL_Upsampled(i,:),SynthesisLpFilter);
+    HH_UpsampledConv(i,:) = conv(HH_Upsampled(i,:),SynthesisHpFilter);
+end
+
+LL_UpsampledConv = LL_UpsampledConv(:,1:end-1);
+LH_UpsampledConv = LH_UpsampledConv(:,1:end-1);
+HL_UpsampledConv = HL_UpsampledConv(:,1:end-1);
+HH_UpsampledConv = HH_UpsampledConv(:,1:end-1);
+
+figure,subplot(2,2,1),imshow(LL_UpsampledConv,[]);title('LL Upsampled Conv Image');
+subplot(2,2,2),imshow(LH_UpsampledConv,[]);title('LH Upsampled Conv Image');
+subplot(2,2,3),imshow(HL_UpsampledConv,[]);title('HL Upsampled Conv Image');
+subplot(2,2,4),imshow(HH_UpsampledConv,[]);title('HH Upsampled Conv Image');
+
+%% Addition
+LowSignal = LL_UpsampledConv + LH_UpsampledConv;
+HighSignal = HL_UpsampledConv + HH_UpsampledConv;
+figure,subplot(2,1,1),imshow(LowSignal,[]);title('Low Signal Image');
+subplot(2,1,2),imshow(HighSignal,[]);title('High Signal  Image');
+
